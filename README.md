@@ -1,3 +1,3 @@
 # Hash
 Diccionario
-Modo de implementación: cerrado.
+Modo de implementación: abierto.
