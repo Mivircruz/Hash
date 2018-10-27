@@ -49,3 +49,16 @@ size_t hash_cantidad(const hash_t *hash){
 	return hash->cantidad;
 }
 
+
+//Seccion de juancito
+bool hash_guardar(hash_t *hash, const char *clave, void *dato){
+	if (!hash)
+		return false;
+	return false;
+}
+
+void *hash_obtener(const hash_t *hash, const char *clave){
+	if (!hash)
+		return NULL;
+	return NULL;
+}
