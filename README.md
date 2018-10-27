@@ -1,3 +1,4 @@
 # Hash
 Diccionario
-Modo de implementación: abierto.
+Modo de implementación: cerrado.
+Alpha = 0.7
