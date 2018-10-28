@@ -16,6 +16,21 @@ size_t funcion_hash(const char* cadena, size_t hash_capacidad){
 }
 
 /* *****************************************************************
+ *        			    FUNCIONES AUXILIARES
+ * *****************************************************************/
+
+void inicializar_estados(hash_t* hash, size_t ini){
+
+	size_t i = 0;
+	for(; i < ini; i++){
+		if(hash->tabla[i].estado == BORRADO)
+			hash->tabla[i].estado = LIBRE;
+	}
+	for(; i < hash->capacidad; i++)
+		hash->tabla[i].estado = LIBRE;
+}
+
+/* *****************************************************************
  *             DEFINICIÓN DE  LAS ESTRUCTURAS HASH E ITERADOR
  * *****************************************************************/
 typedef enum{
@@ -55,8 +70,7 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_dato){
 	hash->capacidad = CAPACIDAD_INICIAL;
 	hash->cantidad = 0;
 	hash->destruir_dato = destruir_dato;
-	for(size_t i = 0; i < CAPACIDAD_INICIAL; i++)
-		hash->tabla[i].estado = LIBRE;
+	inicializar_estados(hash,0);
 	return hash;
 }
 
@@ -101,7 +115,11 @@ bool hash_pertenece(const hash_t *hash, const char *clave){
 }
 
 
+void hash_destruir(hash_t *hash){
+	for(size_t i = 0; i < hash->capacidad; i++){
 
+	}
+}
 
 //Seccion de juancito
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
@@ -115,3 +133,4 @@ void *hash_obtener(const hash_t *hash, const char *clave){
 		return NULL;
 	return NULL;
 }
+
