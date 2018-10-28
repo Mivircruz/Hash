@@ -131,11 +131,11 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	}
 	//Redimensionar el hash a una nueva longitud
 	while(true){ // Re turbio este loop, segu con un DO WHILE pasa
-		if (hash_campo_t[pos_guardado]->estado == LIBRE){
+		if (hash->hash_campo_t[pos_guardado]->estado == LIBRE){
 			//guardar el dato
-			hash_campo_t[pos_guardado]->clave = clave;
-			hash_campo_t[pos_guardaro]->dato = dato;
-			hash_campo_t[pos_guardado]->estado = OCUPADO;
+			hash->hash_campo_t[pos_guardado]->clave = clave;
+			hash->hash_campo_t[pos_guardaro]->dato = dato;
+			hash->hash_campo_t[pos_guardado]->estado = OCUPADO;
 			return true
 		}
 		else{
