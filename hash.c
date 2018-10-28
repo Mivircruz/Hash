@@ -55,6 +55,8 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_dato){
 	hash->capacidad = CAPACIDAD_INICIAL;
 	hash->cantidad = 0;
 	hash->destruir_dato = destruir_dato;
+	for(size_t i = 0; i < CAPACIDAD_INICIAL; i++)
+		hash->tabla[i].estado = LIBRE;
 	return hash;
 }
 
@@ -63,8 +65,42 @@ size_t hash_cantidad(const hash_t *hash){
 }
 
 void *hash_borrar(hash_t *hash, const char *clave){
-	
+
+	size_t indice = funcion_hash(clave, hash->capacidad);
+	size_t inicio = indice-1;
+	void* a_borrar = NULL; 
+	bool vuelta_completa = false;
+
+	for(; !vuelta_completa; indice++){
+
+		if(indice == inicio)
+			vuelta_completa = true;
+
+		if(indice == hash->cantidad+1){
+			indice = 0;
+		}
+
+		if((hash->tabla[indice]).clave == clave){
+			a_borrar = hash->tabla[indice].dato;
+			hash->destruir_dato(hash->tabla[indice].dato);
+			hash->tabla[indice].estado = BORRADO;
+			break;
+		}
+	}
+	return a_borrar;
 }
+
+bool hash_pertenece(const hash_t *hash, const char *clave){
+
+	bool pertenece = false;
+	if((void* dato = hash_borrar(hash, clave))){
+		pertenece = true;
+		hash_guardar(hash, clave);
+	}
+	return pertenece;
+}
+
+
 
 
 //Seccion de juancito
