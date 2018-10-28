@@ -47,17 +47,23 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_dato){
 	if(!hash)
 		return NULL;
 
-	hash->tabla = malloc(sizeof(lista_t)*CAPACIDAD_INICIAL);
+	hash->tabla = malloc(sizeof(hash_campo_t)*CAPACIDAD_INICIAL);
 	if(!hash->tabla){
 		free(hash);
 		return NULL;
 	}
 	hash->capacidad = CAPACIDAD_INICIAL;
 	hash->cantidad = 0;
+	hash->destruir_dato = destruir_dato;
+	return hash;
 }
 
 size_t hash_cantidad(const hash_t *hash){
 	return hash->cantidad;
+}
+
+void *hash_borrar(hash_t *hash, const char *clave){
+	
 }
 
 
