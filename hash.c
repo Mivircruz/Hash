@@ -109,7 +109,7 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 	size_t indice = funcion_hash(clave, hash->capacidad);
 	size_t inicio = indice-1;
-	void* a_borrar = NULL; 
+	void* a_borrar = NULL;
 	bool vuelta_completa = false;
 
 	for(; !vuelta_completa; indice++){
@@ -142,12 +142,30 @@ void hash_destruir(hash_t *hash){
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	if (!hash)
 		return false;
+	size_t pos_guardado = funcion_hash( clave,hash->capacidad);//coloca en pos_guardado el lugar donde guardara dato
+	//FALTA cambiar el tamanno del HASH si el ALFA es > 0.7
+	size_t alfa = ( hash_cantidad(hash) / hash->capacidad);
+	//Redimensionar el hash a una nueva longitud
+	while(true){ // Re turbio este loop, segu con un DO WHILE pasa
+		if (hash_campo_t[pos_guardado]->estado == LIBRE){
+			//guardar el dato
+			hash_campo_t[pos_guardado]->clave = clave;
+			hash_campo_t[pos_guardaro]->dato = dato;
+			hash_campo_t[pos_guardado]->estado = OCUPADO;
+			return true
+		}
+		else{
+			pos_guardar++;
+			if (pos_guardar == hash->capacidad)
+				pos_guardar = 0;
+		}
+	}
 	return false;
 }
 
 void *hash_obtener(const hash_t *hash, const char *clave){
 	if (!hash)
 		return NULL;
+	
 	return NULL;
 }
-
