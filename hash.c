@@ -120,7 +120,15 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 		return false;
 	size_t pos_guardado = funcion_hash( clave,hash->capacidad);//coloca en pos_guardado el lugar donde guardara dato
 	//FALTA cambiar el tamanno del HASH si el ALFA es > 0.7
-	size_t alfa = ( hash_cantidad(hash) / hash->capacidad);
+	size_t alfa = ( ( hash_cantidad(hash) / hash->capacidad) * 10 );
+	if (alfa < 10){
+		//perfectamente modularizable
+		size_t viejo_tamannio = hash->capacidad;
+		size_t nuevo_tamannio = (hash->capacidad * 2)
+		hash->tabla = realloc(sizeof(hash_campo_t)* nuevo_tamannio);
+		hash->capacidad = nuevo_tamannio;
+		inicializar_estados(hash, viejo_tamannio);
+	}
 	//Redimensionar el hash a una nueva longitud
 	while(true){ // Re turbio este loop, segu con un DO WHILE pasa
 		if (hash_campo_t[pos_guardado]->estado == LIBRE){
@@ -136,14 +144,28 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 				pos_guardar = 0;
 		}
 	}
-	return false;
+	return false;//Nunca deberia salir por aqui
 }
 
 void *hash_obtener(const hash_t *hash, const char *clave){
 	if (!hash)
 		return NULL;
-	
-	return NULL;
+		//El viejo pertenece
+	size_t indice = funcion_hash(clave, hash->capacidad);
+	size_t inicio = indice-1;
+	bool vuelta_completa = false;
+		for(; !vuelta_completa; indice++){
+			if(indice == inicio)
+			vuelta_completa = true;
+			if(indice == hash->cantidad+1){
+			indice = 0;
+		}
+			if((hash->tabla[indice]).clave == clave){
+			break;
+		}
+	}
+	return !vuelta_completa;
+return NULL;
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
