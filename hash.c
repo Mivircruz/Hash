@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "hash.h"
-#include "lista.h"
 
 #define CAPACIDAD_INICIAL		7
 
@@ -15,20 +14,6 @@ size_t funcion_hash(const char* cadena, size_t hash_capacidad){
 	return valor_hash % hash_capacidad;
 }
 
-/* *****************************************************************
- *        			    FUNCIONES AUXILIARES
- * *****************************************************************/
-
-void inicializar_estados(hash_t* hash, size_t ini){
-
-	size_t i = 0;
-	for(; i < ini; i++){
-		if(hash->tabla[i].estado == BORRADO)
-			hash->tabla[i].estado = LIBRE;
-	}
-	for(; i < hash->capacidad; i++)
-		hash->tabla[i].estado = LIBRE;
-}
 
 /* *****************************************************************
  *             DEFINICIÓN DE  LAS ESTRUCTURAS HASH E ITERADOR
@@ -51,6 +36,21 @@ struct hash{
 	hash_campo_t* tabla;
 	hash_destruir_dato_t destruir_dato;
 };
+
+/* *****************************************************************
+ *        			    FUNCIONES AUXILIARES
+ * *****************************************************************/
+
+void inicializar_estados(hash_t* hash, size_t ini){
+
+	size_t i = 0;
+	for(; i < ini; i++){
+		if(hash->tabla[i].estado == BORRADO)
+			hash->tabla[i].estado = LIBRE;
+	}
+	for(; i < hash->capacidad; i++)
+		hash->tabla[i].estado = LIBRE;
+}
 
 /* *****************************************************************
  *                   PRIMITIVAS DEL HASH
@@ -78,7 +78,34 @@ size_t hash_cantidad(const hash_t *hash){
 	return hash->cantidad;
 }
 
+
+bool hash_pertenece(const hash_t *hash, const char *clave){
+
+	size_t indice = funcion_hash(clave, hash->capacidad);
+	size_t inicio = indice-1;
+	bool vuelta_completa = false;
+
+	for(; !vuelta_completa; indice++){
+
+		if(indice == inicio)
+			vuelta_completa = true;
+
+		if(indice == hash->cantidad+1){
+			indice = 0;
+		}
+
+		if((hash->tabla[indice]).clave == clave){
+			break;
+		}
+	}
+	return !vuelta_completa;
+}
+
+
 void *hash_borrar(hash_t *hash, const char *clave){
+
+	if(!hash_pertenece(hash,clave))
+		return NULL;
 
 	size_t indice = funcion_hash(clave, hash->capacidad);
 	size_t inicio = indice-1;
@@ -102,16 +129,6 @@ void *hash_borrar(hash_t *hash, const char *clave){
 		}
 	}
 	return a_borrar;
-}
-
-bool hash_pertenece(const hash_t *hash, const char *clave){
-
-	bool pertenece = false;
-	if((void* dato = hash_borrar(hash, clave))){
-		pertenece = true;
-		hash_guardar(hash, clave);
-	}
-	return pertenece;
 }
 
 
