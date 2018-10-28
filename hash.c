@@ -18,11 +18,22 @@ size_t funcion_hash(const char* cadena, size_t hash_capacidad){
 /* *****************************************************************
  *             DEFINICIÓN DE  LAS ESTRUCTURAS HASH E ITERADOR
  * *****************************************************************/
+typedef enum{
+	LIBRE,
+	OCUPADO,
+	BORRADO
+}estado_t;
+
+typedef struct hash_campo{
+	char* clave;
+	void* dato;
+	estado_t estado;
+}hash_campo_t;
 
 struct hash{
-	lista_t* tabla;
 	size_t cantidad;
 	size_t capacidad;
+	hash_campo_t* tabla;
 	hash_destruir_dato_t destruir_dato;
 };
 
