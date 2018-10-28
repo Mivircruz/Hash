@@ -78,30 +78,6 @@ size_t hash_cantidad(const hash_t *hash){
 	return hash->cantidad;
 }
 
-
-bool hash_pertenece(const hash_t *hash, const char *clave){
-
-	size_t indice = funcion_hash(clave, hash->capacidad);
-	size_t inicio = indice-1;
-	bool vuelta_completa = false;
-
-	for(; !vuelta_completa; indice++){
-
-		if(indice == inicio)
-			vuelta_completa = true;
-
-		if(indice == hash->cantidad+1){
-			indice = 0;
-		}
-
-		if((hash->tabla[indice]).clave == clave){
-			break;
-		}
-	}
-	return !vuelta_completa;
-}
-
-
 void *hash_borrar(hash_t *hash, const char *clave){
 
 	if(!hash_pertenece(hash,clave))
@@ -168,4 +144,8 @@ void *hash_obtener(const hash_t *hash, const char *clave){
 		return NULL;
 	
 	return NULL;
+}
+
+bool hash_pertenece(const hash_t *hash, const char *clave){
+	return (hash_obtener(hash,clave)) true : false;
 }
