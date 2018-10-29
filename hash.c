@@ -133,9 +133,10 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	while(true){ // Re turbio este loop, segu con un DO WHILE pasa
 		if (hash->hash_campo_t[pos_guardado]->estado == LIBRE){
 			//guardar el dato
-			hash->hash_campo_t[pos_guardado]->clave = clave;
-			hash->hash_campo_t[pos_guardaro]->dato = dato;
-			hash->hash_campo_t[pos_guardado]->estado = OCUPADO;
+			hash->tabla[pos_guardado]->clave = clave;
+			hash->tabla[pos_guardado]->dato = dato;
+			hash->tabla[pos_guardado]->estado = OCUPADO;
+			(hash->capacidad)++;
 			return true
 		}
 		else{
