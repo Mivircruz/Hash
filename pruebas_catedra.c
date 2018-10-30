@@ -26,7 +26,7 @@ static void prueba_crear_hash_vacio()
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
     print_test("Prueba hash obtener clave A, es NULL, no existe", !hash_obtener(hash, "A"));
     print_test("Prueba hash pertenece clave A, es false, no existe", !hash_pertenece(hash, "A"));
-    //print_test("Prueba hash borrar clave A, es NULL, no existe", !hash_borrar(hash, "A"));
+    print_test("Prueba hash borrar clave A, es NULL, no existe", !hash_borrar(hash, "A"));
 
     //hash_destruir(hash);
 }
@@ -58,7 +58,7 @@ static void prueba_hash_insertar()
     print_test("Prueba hash obtener clave1 es valor1", hash_obtener(hash, clave1) == valor1);
     print_test("Prueba hash obtener clave1 es valor1", hash_obtener(hash, clave1) == valor1);
     print_test("Prueba hash pertenece clave1, es true", hash_pertenece(hash, clave1));
-    //print_test("Prueba hash borrar clave1, es valor1", hash_borrar(hash, clave1) == valor1);
+    print_test("Prueba hash borrar clave1, es valor1", hash_borrar(hash, clave1) == valor1);
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
 
     /* Inserta otros 2 valores y no los borra (se destruyen con el hash) */
@@ -137,7 +137,7 @@ static void prueba_hash_reemplazar_con_destruir()
     /* Se destruye el hash (se debe liberar lo que quedó dentro) */
     hash_destruir(hash);
 }
-/*
+
 static void prueba_hash_borrar()
 {
     hash_t* hash = hash_crear(NULL);
@@ -146,12 +146,12 @@ static void prueba_hash_borrar()
     char *clave2 = "gato", *valor2 = "miau";
     char *clave3 = "vaca", *valor3 = "mu";
 
-     Inserta 3 valores y luego los borra
+    /* Inserta 3 valores y luego los borra*/
     print_test("Prueba hash insertar clave1", hash_guardar(hash, clave1, valor1));
     print_test("Prueba hash insertar clave2", hash_guardar(hash, clave2, valor2));
     print_test("Prueba hash insertar clave3", hash_guardar(hash, clave3, valor3));
 
-     Al borrar cada elemento comprueba que ya no está pero los otros sí.
+    /* Al borrar cada elemento comprueba que ya no está pero los otros sí.*/
     print_test("Prueba hash pertenece clave3, es verdadero", hash_pertenece(hash, clave3));
     print_test("Prueba hash borrar clave3, es valor3", hash_borrar(hash, clave3) == valor3);
     print_test("Prueba hash borrar clave3, es NULL", !hash_borrar(hash, clave3));
@@ -175,7 +175,7 @@ static void prueba_hash_borrar()
 
     //hash_destruir(hash);
 }
-*/
+
 static void prueba_hash_clave_vacia()
 {
     hash_t* hash = hash_crear(NULL);
@@ -189,7 +189,7 @@ static void prueba_hash_clave_vacia()
     print_test("Prueba hash borrar clave vacia, es valor", hash_borrar(hash, clave) == valor);
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
 
-    hash_destruir(hash);
+    //hash_destruir(hash);
 }
 
 static void prueba_hash_valor_null()
@@ -198,15 +198,15 @@ static void prueba_hash_valor_null()
 
     char *clave = "", *valor = NULL;
 
-    /* Inserta 1 valor y luego lo borra */
+    /* Inserta 1 valor y luego lo borra*/
     print_test("Prueba hash insertar clave vacia valor NULL", hash_guardar(hash, clave, valor));
     print_test("Prueba hash la cantidad de elementos es 1", hash_cantidad(hash) == 1);
     print_test("Prueba hash obtener clave vacia es valor NULL", hash_obtener(hash, clave) == valor);
     print_test("Prueba hash pertenece clave vacia, es true", hash_pertenece(hash, clave));
-    //print_test("Prueba hash borrar clave vacia, es valor NULL", hash_borrar(hash, clave) == valor);
+    print_test("Prueba hash borrar clave vacia, es valor NULL", hash_borrar(hash, clave) == valor);
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
 
-    hash_destruir(hash);
+    //hash_destruir(hash);
 }
 
 static void prueba_hash_volumen(size_t largo, bool debug)
@@ -401,14 +401,22 @@ void pruebas_hash_catedra()
 {
     /* Ejecuta todas las pruebas unitarias. */
     prueba_crear_hash_vacio();
+    print_test("finalizado..", true);
     //prueba_iterar_hash_vacio();
     prueba_hash_insertar();
+    print_test("finalizado..", true);
     prueba_hash_reemplazar();
+    print_test("finalizado..", true);
     prueba_hash_reemplazar_con_destruir();
-    //prueba_hash_borrar();
+    print_test("finalizado..", true);
+    prueba_hash_borrar();
+    print_test("finalizado..", true);
     prueba_hash_clave_vacia();
+    print_test("finalizado..", true);
     prueba_hash_valor_null();
+    print_test("finalizado..", true);
     prueba_hash_volumen(5000, true);
+    print_test("finalizado..", true);
     //prueba_hash_iterar();
     //prueba_hash_iterar_volumen(5000);
 }

@@ -102,8 +102,9 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 		if( *(hash->tabla[indice]).clave == *clave){// se agrego "*" porque asi se compara lo apuntado
 			a_borrar = hash->tabla[indice].dato;
-			hash->destruir_dato(hash->tabla[indice].dato);
+			//hash->destruir_dato(hash->tabla[indice].dato);
 			hash->tabla[indice].estado = BORRADO;
+      hash->cantidad--;
 			break;
 		}
 	}
@@ -112,9 +113,9 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 
 void hash_destruir(hash_t *hash){
-	for(size_t i = 0; i < hash->capacidad; i++){
+	/*for(size_t i = 0; i < hash->capacidad; i++){
 		hash->destruir_dato(hash->tabla[i].dato);
-	}
+	}*/
 	free(hash->tabla);
 	free(hash);
 }
@@ -126,17 +127,21 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	char* a_guardar = strdup(clave);
 	size_t pos_guardado = funcion_hash( clave,hash->capacidad);//coloca en pos_guardado el lugar donde guardara dato
 	//FALTA cambiar el tamanno del HASH si el ALFA es > 0.7
-	size_t alfa = ( ( hash_cantidad(hash) / hash->capacidad) * 10 );
-	if (alfa < 10){
+	float alfa = ( ( (float)hash_cantidad(hash) / (float)hash->capacidad) );
+
+  if (alfa > 0.7){
 		//perfectamente modularizable
+    printf("ALFA: %2f\n", alfa);
 		size_t viejo_tamannio = hash->capacidad;
 		size_t nuevo_tamannio = (hash->capacidad * 2);
 		hash->tabla = realloc(hash->tabla, sizeof(hash_campo_t)* nuevo_tamannio);
 		hash->capacidad = nuevo_tamannio;
 		inicializar_estados(hash, viejo_tamannio);
 	}
+
 	//Redimensionar el hash a una nueva longitud
-	while(true){ // Re turbio este loop, segu con un DO WHILE pasa
+	while(true){ // Re turbio este loop, seguro con un DO WHILE pasa
+    //Si la posicion esta libre guarda el dato
 		if (hash->tabla[pos_guardado].estado == LIBRE){
 			//guardar el dato
 			hash->tabla[pos_guardado].clave = a_guardar;
@@ -145,6 +150,13 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 			hash->cantidad++;
 			return true;
 		}
+    //Si la clave esta en uso, sovreeescribo el valor sin alterar la cantidad presente
+    else if (*hash->tabla[pos_guardado].clave == *clave) {
+      hash->tabla[pos_guardado].clave = a_guardar;
+      hash->tabla[pos_guardado].dato = dato;
+      hash->tabla[pos_guardado].estado = OCUPADO;
+      return true;
+    }
 		else{
 			pos_guardado++;
 			if (pos_guardado == hash->capacidad)
@@ -157,9 +169,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 void *hash_obtener(const hash_t *hash, const char *clave){
 	if (!hash || !hash->cantidad)
 		return NULL;
-
-    //Metodo rudimientario
-
+    //Metodo rudimientario de iteracion
 	void* a_obtener = NULL;
 	size_t indice = funcion_hash(clave, hash->capacidad);
 	size_t inicio = indice-1; // SI inicio es -1 que pasa?
