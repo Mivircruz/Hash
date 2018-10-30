@@ -142,11 +142,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 			hash->tabla[pos_guardado].clave = a_guardar;
 			hash->tabla[pos_guardado].dato = dato;
 			hash->tabla[pos_guardado].estado = OCUPADO;
-<<<<<<< HEAD
 			hash->cantidad++;
-=======
-			(hash->capacidad)++;
->>>>>>> 6af45c96a565f84eec9ed6abbe155c3e86c3920a
 			return true;
 		}
 		else{
@@ -161,11 +157,9 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 void *hash_obtener(const hash_t *hash, const char *clave){
 	if (!hash || !hash->cantidad)
 		return NULL;
-<<<<<<< HEAD
-    //Metodo rudimientario
-=======
 
->>>>>>> 6af45c96a565f84eec9ed6abbe155c3e86c3920a
+    //Metodo rudimientario
+
 	void* a_obtener = NULL;
 	size_t indice = funcion_hash(clave, hash->capacidad);
 	size_t inicio = indice-1; // SI inicio es -1 que pasa?
@@ -177,22 +171,10 @@ void *hash_obtener(const hash_t *hash, const char *clave){
         break;
 			if(indice == inicio)
 				vuelta_completa = true;
-<<<<<<< HEAD
 			if(indice == hash->capacidad)
 				indice = 0;
 			}
 		}
-
-=======
-			if(indice == hash->cantidad+1)
-				indice = 0;
-			if((hash->tabla[indice]).clave == clave){
-				a_obtener = hash->tabla[indice].dato;
-				break;
-			}
-		}
-	
->>>>>>> 6af45c96a565f84eec9ed6abbe155c3e86c3920a
 	return a_obtener;
 }
 
