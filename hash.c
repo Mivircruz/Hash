@@ -1,5 +1,8 @@
+ #define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "hash.h"
 
 #define CAPACIDAD_INICIAL		7
@@ -97,7 +100,7 @@ void *hash_borrar(hash_t *hash, const char *clave){
 			indice = 0;
 		}
 
-		if((hash->tabla[indice]).clave == clave){
+		if( *(hash->tabla[indice]).clave == *clave){// se agrego "*" porque asi se compara lo apuntado
 			a_borrar = hash->tabla[indice].dato;
 			hash->destruir_dato(hash->tabla[indice].dato);
 			hash->tabla[indice].estado = BORRADO;
@@ -110,65 +113,70 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 void hash_destruir(hash_t *hash){
 	for(size_t i = 0; i < hash->capacidad; i++){
-
+		hash->destruir_dato(hash->tabla[i].dato);
 	}
+	free(hash->tabla);
+	free(hash);
 }
 
 //Seccion de juancito
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	if (!hash)
 		return false;
+	char* a_guardar = strdup(clave);
 	size_t pos_guardado = funcion_hash( clave,hash->capacidad);//coloca en pos_guardado el lugar donde guardara dato
 	//FALTA cambiar el tamanno del HASH si el ALFA es > 0.7
 	size_t alfa = ( ( hash_cantidad(hash) / hash->capacidad) * 10 );
 	if (alfa < 10){
 		//perfectamente modularizable
 		size_t viejo_tamannio = hash->capacidad;
-		size_t nuevo_tamannio = (hash->capacidad * 2)
-		hash->tabla = realloc(sizeof(hash_campo_t)* nuevo_tamannio);
+		size_t nuevo_tamannio = (hash->capacidad * 2);
+		hash->tabla = realloc(hash->tabla, sizeof(hash_campo_t)* nuevo_tamannio);
 		hash->capacidad = nuevo_tamannio;
 		inicializar_estados(hash, viejo_tamannio);
 	}
 	//Redimensionar el hash a una nueva longitud
 	while(true){ // Re turbio este loop, segu con un DO WHILE pasa
-		if (hash->hash_campo_t[pos_guardado]->estado == LIBRE){
+		if (hash->tabla[pos_guardado].estado == LIBRE){
 			//guardar el dato
-			hash->tabla[pos_guardado]->clave = clave;
-			hash->tabla[pos_guardado]->dato = dato;
-			hash->tabla[pos_guardado]->estado = OCUPADO;
-			(hash->capacidad)++;
-			return true
+			hash->tabla[pos_guardado].clave = a_guardar;
+			hash->tabla[pos_guardado].dato = dato;
+			hash->tabla[pos_guardado].estado = OCUPADO;
+			hash->cantidad++;
+			return true;
 		}
 		else{
-			pos_guardar++;
-			if (pos_guardar == hash->capacidad)
-				pos_guardar = 0;
+			pos_guardado++;
+			if (pos_guardado == hash->capacidad)
+				pos_guardado = 0;
 		}
 	}
 	return false;//Nunca deberia salir por aqui
 }
 
 void *hash_obtener(const hash_t *hash, const char *clave){
-	if (!hash)
+	if (!hash || !hash->cantidad)
 		return NULL;
-		//El viejo pertenece
+    //Metodo rudimientario
+	void* a_obtener = NULL;
 	size_t indice = funcion_hash(clave, hash->capacidad);
-	size_t inicio = indice-1;
+	size_t inicio = indice-1; // SI inicio es -1 que pasa?
+  //Recorrido rudimentario por el hash
 	bool vuelta_completa = false;
 		for(; !vuelta_completa; indice++){
+      if( *(hash->tabla[indice]).clave == *clave){//Se agrego "*" porque sino se comparan PUNTEROS y no el contenido
+        a_obtener = hash->tabla[indice].dato;
+        break;
 			if(indice == inicio)
-			vuelta_completa = true;
-			if(indice == hash->cantidad+1){
-			indice = 0;
+				vuelta_completa = true;
+			if(indice == hash->capacidad)
+				indice = 0;
+			}
 		}
-			if((hash->tabla[indice]).clave == clave){
-			break;
-		}
-	}
-	return !vuelta_completa;
-return NULL;
+
+	return a_obtener;
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
-	return (hash_obtener(hash,clave)) true : false;
+	return (hash_obtener(hash,clave)) ? true : false;
 }
