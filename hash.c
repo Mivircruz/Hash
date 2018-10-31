@@ -54,8 +54,10 @@ void inicializar_estados(hash_t* hash, size_t ini){
 		if(hash->tabla[i].estado == BORRADO)
 			hash->tabla[i].estado = LIBRE;
 	}
-	for(; i < hash->capacidad; i++)
+	for(; i < hash->capacidad; i++){
 		hash->tabla[i].estado = LIBRE;
+    hash->tabla[i].clave = NULL;//Para que cuando al recorrer al destruir, el FREE no explote
+  }
 }
 
 //Compara el estado del hash con el factor de redimension. Devuelve true si
@@ -142,6 +144,8 @@ void *hash_borrar(hash_t *hash, const char *clave){
 			if(hash->destruir_dato)
 				hash->destruir_dato(hash->tabla[indice].dato);
 			hash->tabla[indice].estado = BORRADO;
+      //free(hash->tabla[indice].clave); // Borro la clave, para que la necesito?
+      //hash->tabla[indice].clave = NULL; // Para luego pasarlo de formasegura a FREE
 			hash->cantidad--;
 			break;
 		}
@@ -152,9 +156,9 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 void hash_destruir(hash_t *hash){
 	for(size_t i = 0; i < hash->capacidad; i++){
-    if (hash->destruir_dato)
-		  hash->destruir_dato(hash->tabla[i].dato);
-      free(hash->tabla[i].clave);
+    /*if (hash->destruir_dato)
+		  hash->destruir_dato(hash->tabla[i].dato);*/
+    free(hash->tabla[i].clave);
 	}
 	free(hash->tabla);
 	free(hash);
@@ -166,7 +170,6 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 		return false;
 	char* a_guardar = strdup(clave);
 	size_t pos_guardado = funcion_hash( clave,hash->capacidad);//coloca en pos_guardado el lugar donde guardara dato
-	//FALTA cambiar el tamanno del HASH si el ALFA es > 0.7
 	bool redimensionar = hash_a_redimensionar(hash);
   if (redimensionar){
 		//perfectamente modularizable
@@ -189,8 +192,8 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 			return true;
 		}
     //Si la clave esta en uso, sovreeescribo el valor sin alterar la cantidad presente
-    else if (*hash->tabla[pos_guardado].clave == *clave) {
-      free(hash->tabla[pos_guardado].clave); //Esto borra la vieja clave que hace perder memoria y la reemplaza por la nueva que ES LA MISMA en contenido
+    else if (!strcmp( (hash->tabla[pos_guardado].clave) , clave)) {
+      //free(hash->tabla[pos_guardado].clave); //Esto borra la vieja clave que hace perder memoria y la reemplaza por la nueva que ES LA MISMA en contenido
       hash->tabla[pos_guardado].clave = a_guardar;
       hash->tabla[pos_guardado].dato = dato;
       hash->tabla[pos_guardado].estado = OCUPADO;

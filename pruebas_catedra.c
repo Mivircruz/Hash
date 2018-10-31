@@ -415,8 +415,8 @@ void pruebas_hash_catedra()
     print_test("finalizado..", true);
     prueba_hash_valor_null();
     print_test("finalizado..", true);
-    //prueba_hash_volumen(5000, true);
-    //print_test("finalizado..", true);
+    prueba_hash_volumen(5000, true);
+    print_test("finalizado..", true);
     //prueba_hash_iterar();
     //prueba_hash_iterar_volumen(5000);
 }
