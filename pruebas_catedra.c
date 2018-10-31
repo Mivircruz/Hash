@@ -28,7 +28,7 @@ static void prueba_crear_hash_vacio()
     print_test("Prueba hash pertenece clave A, es false, no existe", !hash_pertenece(hash, "A"));
     print_test("Prueba hash borrar clave A, es NULL, no existe", !hash_borrar(hash, "A"));
 
-    //hash_destruir(hash);
+    hash_destruir(hash);
 }
 /*
 static void prueba_iterar_hash_vacio()
@@ -74,7 +74,7 @@ static void prueba_hash_insertar()
     print_test("Prueba hash obtener clave3 es valor3", hash_obtener(hash, clave3) == valor3);
     print_test("Prueba hash pertenece clave3, es true", hash_pertenece(hash, clave3));
 
-    //hash_destruir(hash);
+    hash_destruir(hash);
 }
 
 static void prueba_hash_reemplazar()
@@ -101,7 +101,7 @@ static void prueba_hash_reemplazar()
     print_test("Prueba hash obtener clave2 es valor2b", hash_obtener(hash, clave2) == valor2b);
     print_test("Prueba hash la cantidad de elementos es 2", hash_cantidad(hash) == 2);
 
-    //hash_destruir(hash);
+    hash_destruir(hash);
 }
 
 static void prueba_hash_reemplazar_con_destruir()
@@ -173,7 +173,7 @@ static void prueba_hash_borrar()
     print_test("Prueba hash obtener clave2, es NULL", !hash_obtener(hash, clave2));
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
 
-    //hash_destruir(hash);
+    hash_destruir(hash);
 }
 
 static void prueba_hash_clave_vacia()
@@ -189,7 +189,7 @@ static void prueba_hash_clave_vacia()
     print_test("Prueba hash borrar clave vacia, es valor", hash_borrar(hash, clave) == valor);
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
 
-    //hash_destruir(hash);
+    hash_destruir(hash);
 }
 
 static void prueba_hash_valor_null()
@@ -206,7 +206,7 @@ static void prueba_hash_valor_null()
     print_test("Prueba hash borrar clave vacia, es valor NULL", hash_borrar(hash, clave) == valor);
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
 
-    //hash_destruir(hash);
+    hash_destruir(hash);
 }
 
 static void prueba_hash_volumen(size_t largo, bool debug)
@@ -415,8 +415,8 @@ void pruebas_hash_catedra()
     print_test("finalizado..", true);
     prueba_hash_valor_null();
     print_test("finalizado..", true);
-    prueba_hash_volumen(5000, true);
-    print_test("finalizado..", true);
+    //prueba_hash_volumen(5000, true);
+    //print_test("finalizado..", true);
     //prueba_hash_iterar();
     //prueba_hash_iterar_volumen(5000);
 }

@@ -58,7 +58,7 @@ void inicializar_estados(hash_t* hash, size_t ini){
 		hash->tabla[i].estado = LIBRE;
 }
 
-//Compara el estado del hash con el factor de redimension. Devuelve true si 
+//Compara el estado del hash con el factor de redimension. Devuelve true si
 //se debe redimensionar el hash.
 bool hash_a_redimensionar(hash_t* hash){
 
@@ -86,7 +86,7 @@ int recorrer_hash(const hash_t* hash, const char* clave){
      	if(!strcmp(hash->tabla[indice].clave, clave)){
 	        pertenece = true;
 	        break;
-    	}	
+    	}
 	}
 	return (pertenece) ? indice : -1;
 
@@ -151,10 +151,10 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 
 void hash_destruir(hash_t *hash){
-
-	if(hash->destruir_dato){
-		for(size_t i = 0; i < hash->capacidad; i++)
-			hash->destruir_dato(hash->tabla[i].dato);
+	for(size_t i = 0; i < hash->capacidad; i++){
+    if (hash->destruir_dato)
+		  hash->destruir_dato(hash->tabla[i].dato);
+      free(hash->tabla[i].clave);
 	}
 	free(hash->tabla);
 	free(hash);
@@ -190,6 +190,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 		}
     //Si la clave esta en uso, sovreeescribo el valor sin alterar la cantidad presente
     else if (*hash->tabla[pos_guardado].clave == *clave) {
+      free(hash->tabla[pos_guardado].clave); //Esto borra la vieja clave que hace perder memoria y la reemplaza por la nueva que ES LA MISMA en contenido
       hash->tabla[pos_guardado].clave = a_guardar;
       hash->tabla[pos_guardado].dato = dato;
       hash->tabla[pos_guardado].estado = OCUPADO;
@@ -218,4 +219,3 @@ void *hash_obtener(const hash_t *hash, const char *clave){
 
 	return hash->tabla[indice].dato;
 }
-
