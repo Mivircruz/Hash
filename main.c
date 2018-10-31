@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
         return failure_count() > 0;
     }
 
-    printf("~~~ PRUEBAS CÁTEDRA ~~~\n");
+    printf("\n~~~ PRUEBAS CÁTEDRA ~~~\n");
     pruebas_hash_catedra();
 
     return failure_count() > 0;
