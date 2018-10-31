@@ -193,7 +193,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 		}
     //Si la clave esta en uso, sovreeescribo el valor sin alterar la cantidad presente
     else if (!strcmp( (hash->tabla[pos_guardado].clave) , clave)) {
-      //free(hash->tabla[pos_guardado].clave); //Esto borra la vieja clave que hace perder memoria y la reemplaza por la nueva que ES LA MISMA en contenido
+      free(hash->tabla[pos_guardado].clave); //Esto borra la vieja clave que hace perder memoria y la reemplaza por la nueva que ES LA MISMA en contenido
       hash->tabla[pos_guardado].clave = a_guardar;
       hash->tabla[pos_guardado].dato = dato;
       hash->tabla[pos_guardado].estado = OCUPADO;
