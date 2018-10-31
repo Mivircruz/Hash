@@ -41,6 +41,12 @@ struct hash{
 	hash_destruir_dato_t destruir_dato;
 };
 
+typedef struct hash_iter{
+  hash_campo_t* ant;
+  hash_campo_t* actual;
+  hash_t* tda; //Nose como llamarle
+} hash_iter_t;
+
 /* *****************************************************************
  *        			    FUNCIONES AUXILIARES
  * *****************************************************************/
@@ -221,4 +227,50 @@ void *hash_obtener(const hash_t *hash, const char *clave){
 		return NULL;
 
 	return hash->tabla[indice].dato;
+}
+
+/********************************************************
+ITERADORES EXTERNOS
+*********************************************************/
+
+hash_iter_t *hash_iter_crear(const hash_t *hash){
+  if (!hash)
+    return NULL;
+  hash_iter_t* resultado = malloc(sizeof(hash_iter_t));
+  if (!resultado)
+    return NULL;
+  resultado->ant = NULL;
+  resultado->actual = hash->tabla;
+  //resultado->tda = hash; No se puede hacer porque lo que se envia es CONST
+  return resultado;
+}
+
+bool hash_iter_al_final(const hash_iter_t *iter){
+  //Si el actual apunta al ultimo elemento de la tabla (si no es este vaor, es el -1)
+  if (!iter)
+    return false;
+  return (iter->actual == NULL);
+}
+
+bool hash_iter_avanzar(hash_iter_t *iter){
+  if (!iter)
+    return false;
+  if (hash_iter_al_final(iter))
+    return false;
+  iter->ant = iter->actual;
+  iter->actual = (iter->actual);//Aritmetica de punteros, deberia de avanzar al siguiente elemento de la tabla
+  return true;
+}
+const char *hash_iter_ver_actual(const hash_iter_t *iter){
+  if (!iter)
+    return NULL;
+  if (hash_iter_al_final(iter))
+    return NULL;
+  //Puse que DEVUELVE LA CLAVE, nose si es el dato o la clave
+  return iter->actual->clave;
+}
+
+void hash_iter_destruir(hash_iter_t* iter){
+  //CREO que solo esto
+  free(iter);
 }
