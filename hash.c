@@ -6,6 +6,7 @@
 #include "hash.h"
 
 #define CAPACIDAD_INICIAL		7
+#define FACTOR_REDIMENSION		0.7
 
 //Función de hashing
 
@@ -44,6 +45,8 @@ struct hash{
  *        			    FUNCIONES AUXILIARES
  * *****************************************************************/
 
+//Inicializa todos los estados el LIBRE si el hash fue recién creado.
+//Si se está redimensionando el hash, inicializa en LIBRE los BORRADOS.
 void inicializar_estados(hash_t* hash, size_t ini){
 
 	size_t i = 0;
@@ -53,6 +56,40 @@ void inicializar_estados(hash_t* hash, size_t ini){
 	}
 	for(; i < hash->capacidad; i++)
 		hash->tabla[i].estado = LIBRE;
+}
+
+//Compara el estado del hash con el factor de redimension. Devuelve true si 
+//se debe redimensionar el hash.
+bool hash_a_redimensionar(hash_t* hash){
+
+	float factor_crecimiento = (float)hash->cantidad /(float)hash->capacidad;
+	return (factor_crecimiento < FACTOR_REDIMENSION) ? false : true;
+
+}
+
+//Recorre el arreglo devolviendo la posición en la que se encuentra la clave.
+//En casp de no encontrarla, devuelve -1
+int recorrer_hash(const hash_t* hash, const char* clave){
+
+	if (!hash || !hash->cantidad)
+		return -1;
+
+	size_t indice = funcion_hash(clave, hash->capacidad);
+	bool pertenece = false;
+
+	for(size_t contador = indice; contador < hash->capacidad; contador++, indice++){
+
+		if(indice == hash->capacidad)
+				indice = 0;
+		if(hash->tabla[indice].estado == LIBRE || hash->tabla[indice].estado == BORRADO)
+			continue;
+     	if(!strcmp(hash->tabla[indice].clave, clave)){
+	        pertenece = true;
+	        break;
+    	}	
+	}
+	return (pertenece) ? indice : -1;
+
 }
 
 /* *****************************************************************
@@ -100,11 +137,12 @@ void *hash_borrar(hash_t *hash, const char *clave){
 			indice = 0;
 		}
 
-		if( *(hash->tabla[indice]).clave == *clave){// se agrego "*" porque asi se compara lo apuntado
+		if(!strcmp(hash->tabla[indice].clave, clave)){
 			a_borrar = hash->tabla[indice].dato;
-			//hash->destruir_dato(hash->tabla[indice].dato);
+			if(hash->destruir_dato)
+				hash->destruir_dato(hash->tabla[indice].dato);
 			hash->tabla[indice].estado = BORRADO;
-      hash->cantidad--;
+			hash->cantidad--;
 			break;
 		}
 	}
@@ -113,9 +151,11 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 
 void hash_destruir(hash_t *hash){
-	/*for(size_t i = 0; i < hash->capacidad; i++){
-		hash->destruir_dato(hash->tabla[i].dato);
-	}*/
+
+	if(hash->destruir_dato){
+		for(size_t i = 0; i < hash->capacidad; i++)
+			hash->destruir_dato(hash->tabla[i].dato);
+	}
 	free(hash->tabla);
 	free(hash);
 }
@@ -127,11 +167,9 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	char* a_guardar = strdup(clave);
 	size_t pos_guardado = funcion_hash( clave,hash->capacidad);//coloca en pos_guardado el lugar donde guardara dato
 	//FALTA cambiar el tamanno del HASH si el ALFA es > 0.7
-	float alfa = ( ( (float)hash_cantidad(hash) / (float)hash->capacidad) );
-
-  if (alfa > 0.7){
+	bool redimensionar = hash_a_redimensionar(hash);
+  if (redimensionar){
 		//perfectamente modularizable
-    printf("ALFA: %2f\n", alfa);
 		size_t viejo_tamannio = hash->capacidad;
 		size_t nuevo_tamannio = (hash->capacidad * 2);
 		hash->tabla = realloc(hash->tabla, sizeof(hash_campo_t)* nuevo_tamannio);
@@ -166,28 +204,18 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	return false;//Nunca deberia salir por aqui
 }
 
-void *hash_obtener(const hash_t *hash, const char *clave){
-	if (!hash || !hash->cantidad)
-		return NULL;
-    //Metodo rudimientario de iteracion
-	void* a_obtener = NULL;
-	size_t indice = funcion_hash(clave, hash->capacidad);
-	size_t inicio = indice-1; // SI inicio es -1 que pasa?
-  //Recorrido rudimentario por el hash
-	bool vuelta_completa = false;
-		for(; !vuelta_completa; indice++){
-      if( *(hash->tabla[indice]).clave == *clave){//Se agrego "*" porque sino se comparan PUNTEROS y no el contenido
-        a_obtener = hash->tabla[indice].dato;
-        break;
-			if(indice == inicio)
-				vuelta_completa = true;
-			if(indice == hash->capacidad)
-				indice = 0;
-			}
-		}
-	return a_obtener;
+bool hash_pertenece(const hash_t *hash, const char *clave){
+
+	return (recorrer_hash(hash,clave) != -1) ? true : false;
 }
 
-bool hash_pertenece(const hash_t *hash, const char *clave){
-	return (hash_obtener(hash,clave)) ? true : false;
+
+void *hash_obtener(const hash_t *hash, const char *clave){
+
+	int indice;
+	if((indice = recorrer_hash(hash,clave)) == -1)
+		return NULL;
+
+	return hash->tabla[indice].dato;
 }
+
