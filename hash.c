@@ -95,7 +95,7 @@ long int hash_recorrer(const hash_t* hash, const char* clave){
 long int iter_hash_recorrer(hash_iter_t* iter, size_t inicio){
 
 	long int i;
-  if (iter->nodo_contador == iter->cantidad_final_hash){
+  if (iter->nodo_contador >= iter->cantidad_final_hash){
     return -1;
   }
 	for(i = inicio; iter->tabla[i].estado != OCUPADO; i++);
