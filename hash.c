@@ -147,21 +147,20 @@ void *hash_borrar(hash_t *hash, const char *clave){
 	if(indice == -1)
 		return NULL;
 
-	void* a_borrar = hash->tabla[indice].dato;
-	if(hash->destruir_dato)
-		hash->destruir_dato(hash->tabla[indice].dato);
 	free(hash->tabla[indice].clave);
 	hash->tabla[indice].estado = BORRADO;
 	hash->cantidad--;
 
-	return a_borrar;
+	return hash->tabla[indice].dato;
 }
 
 void hash_destruir(hash_t *hash){
 	for(size_t i = 0; i < hash->capacidad; i++){
-		if(hash->tabla[i].estado == OCUPADO){
+		if(hash->tabla[i].estado != LIBRE){
 			if(hash->destruir_dato)
 				hash->destruir_dato(hash->tabla[i].dato);
+			if(hash->tabla[i].estado == BORRADO)
+				continue;
 			free(hash->tabla[i].clave);
 		}
 	}
@@ -204,7 +203,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 		}
 	}
 
-		//Si la posicion esta libre, se guarda el dato
+	//Si la posicion esta libre, se guarda el dato
 
 	hash->tabla[indice].clave = strdup(clave);
 	hash->tabla[indice].dato = dato;
