@@ -7,7 +7,7 @@
 
 #define CAPACIDAD_INICIAL		37
 #define FACTOR_DE_CARGA			0.7
-#define FACTOR_REDIMENSION		2
+#define FACTOR_REDIMENSION		3
 
 //Función de hashing
 
@@ -81,8 +81,10 @@ long int hash_buscar_clave(const hash_t* hash, const char* clave){
 
 		if(indice == hash->capacidad)
 				indice = 0;
+
 		if(hash->tabla[indice].estado == LIBRE || hash->tabla[indice].estado == BORRADO)
 			continue;
+		
 		if(!strcmp(hash->tabla[indice].clave, clave)){
 			pertenece = true;
 			break;
@@ -113,6 +115,32 @@ long int hash_cantidad_ocupados(const hash_t* hash){
 			borrados++;
 	}
 	return hash->cantidad - borrados;
+}
+
+bool hash_a_redimensionar(hash_t* hash){
+
+	size_t capacidad_nueva = hash->capacidad * FACTOR_REDIMENSION;
+	size_t posicion;
+
+	hash_campo_t* tabla_nueva = malloc(sizeof(hash_campo_t) * capacidad_nueva);
+	if(!tabla_nueva)
+		return false;
+
+	for(size_t i = 0; i < hash->capacidad; i++){
+		if(hash->tabla[i].estado == OCUPADO){
+			posicion = funcion_hash(hash->tabla[i].clave, capacidad_nueva);
+			tabla_nueva[posicion].clave = hash->tabla[i].clave;
+			tabla_nueva[posicion].dato = hash->tabla[i].dato;
+			tabla_nueva[posicion].estado = OCUPADO;
+		}
+		else
+			tabla_nueva[i].estado = LIBRE;
+	}
+	free(hash->tabla);
+	hash->tabla = tabla_nueva;
+	hash->capacidad = capacidad_nueva;
+	return true;
+	
 }
 
 /* *****************************************************************
@@ -173,13 +201,8 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	//En el caso de que el Hash haya alcanzado el factor de carga, se redimensiona.
 
 	if((float)hash->cantidad /(float)hash->capacidad > FACTOR_DE_CARGA){
-		size_t capacidad_inicial = hash->capacidad;
-		hash_campo_t* aux = realloc(hash->tabla, sizeof(hash_campo_t)* capacidad_inicial*FACTOR_REDIMENSION);
-		if(!aux)
+		if(!hash_a_redimensionar(hash))
 			return false;
-		hash->tabla = aux;
-		hash->capacidad = capacidad_inicial * FACTOR_REDIMENSION;
-		inicializar_estados(hash, capacidad_inicial);
 	}
 
 	//Se procede a guardar el dato.
