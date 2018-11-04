@@ -69,7 +69,7 @@ void inicializar_estados(hash_t* hash, size_t ini){
 
 //Recorre el arreglo devolviendo la posición en la que se encuentra la clave.
 //En casp de no encontrarla, devuelve -1
-long int hash_recorrer(const hash_t* hash, const char* clave){
+long int hash_buscar_clave(const hash_t* hash, const char* clave){
 
 	if (!hash || !hash->cantidad)
 		return -1;
@@ -83,23 +83,36 @@ long int hash_recorrer(const hash_t* hash, const char* clave){
 				indice = 0;
 		if(hash->tabla[indice].estado == LIBRE || hash->tabla[indice].estado == BORRADO)
 			continue;
-			if(!strcmp(hash->tabla[indice].clave, clave)){
-					pertenece = true;
-					break;
-			}
+		if(!strcmp(hash->tabla[indice].clave, clave)){
+			pertenece = true;
+			break;
+		}
+		
 	}
 	return (pertenece) ? (long int)indice : -1;
 
 }
 
-long int iter_hash_recorrer(hash_iter_t* iter, size_t inicio){
+long int hash_siguiente_ocupado(hash_iter_t* iter, size_t inicio){
 
 	long int i;
-  if (iter->nodo_contador >= iter->cantidad_final_hash){
+	if (iter->nodo_contador >= iter->cantidad_final_hash)
     return -1;
-  }
+
 	for(i = inicio; iter->tabla[i].estado != OCUPADO; i++);
 	return i;
+}
+
+long int hash_cantidad_ocupados(const hash_t* hash){
+	if(!hash->cantidad)
+		return 0;
+
+	long int borrados = 0;
+	for(long int i = 0; i < hash->capacidad; i++){
+		if(hash->tabla[i].estado == BORRADO)
+			borrados++;
+	}
+	return hash->cantidad - borrados;
 }
 
 /* *****************************************************************
@@ -130,7 +143,7 @@ size_t hash_cantidad(const hash_t *hash){
 
 void *hash_borrar(hash_t *hash, const char *clave){
 
-	long int indice = hash_recorrer(hash,clave);
+	long int indice = hash_buscar_clave(hash,clave);
 	if(indice == -1)
 		return NULL;
 
@@ -203,14 +216,14 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
 
-	return (hash_recorrer(hash,clave) != -1) ? true : false;
+	return (hash_buscar_clave(hash,clave) != -1) ? true : false;
 }
 
 
 void *hash_obtener(const hash_t *hash, const char *clave){
 
 	long int indice;
-	if((indice = hash_recorrer(hash,clave)) == -1)
+	if((indice = hash_buscar_clave(hash,clave)) == -1)
 		return NULL;
 
 	return hash->tabla[indice].dato;
@@ -231,25 +244,19 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 
 	hash_iter->tabla = hash->tabla;
 	hash_iter->nodo_contador = 0;
-	if(!hash->cantidad || hash->cantidad == 1){
-		hash_iter->cantidad_final_hash = hash->cantidad;
-		if(!hash->cantidad)
-			hash_iter->posicion = -1;
-	}
-	else{
-		hash_iter->cantidad_final_hash = hash->cantidad;
-		hash_iter->posicion = iter_hash_recorrer(hash_iter,0);
-		hash_iter->nodo_contador = 1;
-	}
+
+	hash_iter->cantidad_final_hash = hash_cantidad_ocupados(hash);
+	hash_iter->posicion = hash_siguiente_ocupado(hash_iter,0);
+	hash_iter->nodo_contador = 1;
+
 	return hash_iter;
 }
 
 bool hash_iter_al_final(const hash_iter_t *iter){
 
-	if (iter->nodo_contador > iter->cantidad_final_hash || iter->posicion == -1)
+	if(iter->nodo_contador > iter->cantidad_final_hash || iter->posicion == -1)
 		return true;
-	else
-		return false;
+	return false;
 }
 
 bool hash_iter_avanzar(hash_iter_t *iter){
@@ -257,12 +264,11 @@ bool hash_iter_avanzar(hash_iter_t *iter){
 	if(!iter)
 		return false;
 	if(hash_iter_al_final(iter)){
-			iter->posicion = -1;
-			return false;
-
-		}
-		iter->posicion = iter_hash_recorrer(iter, iter->posicion+1);
-		iter->nodo_contador++;
+		iter->posicion = -1;
+		return false;
+	}
+	iter->posicion = hash_siguiente_ocupado(iter, iter->posicion+1);
+	iter->nodo_contador++;
 	return true;
 }
 const char *hash_iter_ver_actual(const hash_iter_t *iter){
