@@ -159,9 +159,8 @@ void hash_destruir(hash_t *hash){
 		if(hash->tabla[i].estado != LIBRE){
 			if(hash->destruir_dato)
 				hash->destruir_dato(hash->tabla[i].dato);
-			if(hash->tabla[i].estado == BORRADO)
-				continue;
-			free(hash->tabla[i].clave);
+			if(hash->tabla[i].estado == OCUPADO)
+				free(hash->tabla[i].clave);
 		}
 	}
 	free(hash->tabla);
