@@ -5,7 +5,7 @@
 #include <string.h>
 #include "hash.h"
 
-#define CAPACIDAD_INICIAL		7
+#define CAPACIDAD_INICIAL		37
 #define FACTOR_DE_CARGA			0.7
 #define FACTOR_REDIMENSION		2
 
