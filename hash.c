@@ -156,11 +156,10 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 void hash_destruir(hash_t *hash){
 	for(size_t i = 0; i < hash->capacidad; i++){
-		if(hash->tabla[i].estado != LIBRE){
+		if(hash->tabla[i].estado == OCUPADO){
 			if(hash->destruir_dato)
 				hash->destruir_dato(hash->tabla[i].dato);
-			if(hash->tabla[i].estado == OCUPADO)
-				free(hash->tabla[i].clave);
+			free(hash->tabla[i].clave);
 		}
 	}
 	free(hash->tabla);
