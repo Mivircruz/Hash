@@ -55,16 +55,10 @@ typedef struct hash_iter{
 
 //Inicializa todos los estados el LIBRE si el hash fue recién creado.
 //Si se está redimensionando el hash, inicializa en LIBRE los BORRADOS.
-void inicializar_estados(hash_t* hash, size_t ini){
+void inicializar_estados(hash_t* hash){
 
-	size_t i = 0;
-	for(; i < ini; i++){
-		if(hash->tabla[i].estado == BORRADO)
-			hash->tabla[i].estado = LIBRE;
-	}
-	for(; i < hash->capacidad; i++){
+	for(size_t i = 0; i < hash->capacidad; i++)
 		hash->tabla[i].estado = LIBRE;
-	}
 }
 
 //Recorre el arreglo devolviendo la posición en la que se encuentra la clave.
@@ -124,21 +118,14 @@ bool hash_a_redimensionar(hash_t* hash){
 	size_t capacidad_vieja = hash->capacidad;
 	hash_campo_t* tabla_vieja = hash->tabla;
 	size_t nueva_capacidad = hash->capacidad * FACTOR_REDIMENSION;
-  //Malloqueo la nueva Tabla
 	hash->tabla = malloc(sizeof (hash_campo_t) * nueva_capacidad );
-  //le asigno la nueva capacidad
 	hash->capacidad = nueva_capacidad;
-  //Coloco que su cantidad es 0, aumentara cuandos se le guarden elementos
-  hash->cantidad = 0;
-  //los inicializo, asi no se rompe
-  inicializar_estados(hash,0);
+	hash->cantidad = 0;
+ 	inicializar_estados(hash);
 	for(size_t i = 0; i < capacidad_vieja; i++){
-    //a cada ocupado de la veja tabla lo "copio a la nueva"
 		if(tabla_vieja[i].estado == OCUPADO) {
 			hash_guardar(hash, tabla_vieja[i].clave, tabla_vieja[i].dato);
 			free(tabla_vieja[i].clave);
-		/*} else {
-			hash->tabla[i].estado = LIBRE;*/
 		}
 	}
 	free(tabla_vieja);
@@ -164,7 +151,7 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_dato){
 	hash->capacidad = CAPACIDAD_INICIAL;
 	hash->cantidad = 0;
 	hash->destruir_dato = destruir_dato;
-	inicializar_estados(hash,0);
+	inicializar_estados(hash);
 	return hash;
 }
 
@@ -186,7 +173,9 @@ void *hash_borrar(hash_t *hash, const char *clave){
 }
 
 void hash_destruir(hash_t *hash){
+
 	for(size_t i = 0; i < hash->capacidad; i++){
+
 		if(hash->tabla[i].estado == OCUPADO){
 			if(hash->destruir_dato)
 				hash->destruir_dato(hash->tabla[i].dato);
@@ -199,8 +188,6 @@ void hash_destruir(hash_t *hash){
 
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 
-	size_t indice = funcion_hash( clave,hash->capacidad);
-
 	//En el caso de que el Hash haya alcanzado el factor de carga, se redimensiona.
 
 	if(((float)hash->cantidad /(float)hash->capacidad) > FACTOR_DE_CARGA){
@@ -209,6 +196,8 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	}
 
 	//Se procede a guardar el dato.
+
+	size_t indice = funcion_hash(clave, hash->capacidad);
 
 	for(; hash->tabla[indice].estado != LIBRE; indice++){
 
