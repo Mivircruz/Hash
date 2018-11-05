@@ -88,7 +88,7 @@ long int hash_buscar_clave(const hash_t* hash, const char* clave){
 			pertenece = true;
 			break;
 		}
-		
+
 	}
 	return (pertenece) ? (long int)indice : -1;
 
@@ -118,25 +118,32 @@ long int hash_cantidad_ocupados(const hash_t* hash){
 
 bool hash_a_redimensionar(hash_t* hash){
 
-	size_t capacidad_vieja = hash->capacidad;
+  if(!hash->tabla)
+    return false;
 
+	size_t capacidad_vieja = hash->capacidad;
 	hash_campo_t* tabla_vieja = hash->tabla;
 	size_t nueva_capacidad = hash->capacidad * FACTOR_REDIMENSION;
-	hash->tabla = malloc(sizeof(hash_campo_t) * nueva_capacidad);
-	if(!hash->tabla)
-		return false;
+  //Malloqueo la nueva Tabla
+	hash->tabla = malloc(sizeof (hash_campo_t) * nueva_capacidad );
+  //le asigno la nueva capacidad
 	hash->capacidad = nueva_capacidad;
+  //Coloco que su cantidad es 0, aumentara cuandos se le guarden elementos
+  hash->cantidad = 0;
+  //los inicializo, asi no se rompe
+  inicializar_estados(hash,0);
 	for(size_t i = 0; i < capacidad_vieja; i++){
+    //a cada ocupado de la veja tabla lo "copio a la nueva"
 		if(tabla_vieja[i].estado == OCUPADO) {
 			hash_guardar(hash, tabla_vieja[i].clave, tabla_vieja[i].dato);
 			free(tabla_vieja[i].clave);
-		} else {
-			hash->tabla[i].estado = LIBRE;
+		/*} else {
+			hash->tabla[i].estado = LIBRE;*/
 		}
 	}
 	free(tabla_vieja);
 	return true;
-	
+
 }
 
 /* *****************************************************************
